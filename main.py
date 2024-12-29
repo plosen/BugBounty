@@ -1,16 +1,14 @@
-# main.py
+import logging
+import json
 from tools import (
-    run_kali_tool, enumerate_domains, scan_vulnerabilities, fuzz_targets,
+    enumerate_domains, scan_vulnerabilities, fuzz_targets,
     analyze_code, perform_sqlmap_scan, analyze_with_wordlists, run_burp_suite
 )
 from api_integration import ask_chatgpt
 from tester import perform_tests, generate_test_plan, execute_test_plan
-import logging
-import os
-import json
-import argparse
 from config import DEFAULT_DOMAIN, DEFAULT_CODE_DIRECTORY
-from api_integration import openai_api_key
+from datetime import datetime
+
 # Настройка логирования для MAIN.py
 logging.basicConfig(
     filename='main_error_log.txt',
@@ -26,15 +24,24 @@ general_handler = logging.FileHandler('general_log.txt')
 general_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 general_logger.addHandler(general_handler)
 
+
+def save_to_file(vulnerabilities, responses, filename="chatgpt_vulnerabilities_responses.txt"):
+    """
+    Сохраняет уязвимости и ответы ChatGPT в файл.
+    """
+    with open(filename, "a", encoding="utf-8") as file:
+        for vuln, response in zip(vulnerabilities, responses):
+            file.write(f"Vulnerability: {vuln}\n")
+            file.write(f"ChatGPT Response: {response}\n")
+            file.write("-" * 80 + "\n")
+    general_logger.info(f"All vulnerabilities and ChatGPT responses have been saved to {filename}")
+    print(f"✅ Уязвимости и ответы сохранены в файл: {filename}")
+
+
 def main():
     # Парсинг аргументов командной строки
-    parser = argparse.ArgumentParser(description="Automated Bug Bounty Testing Tool")
-    parser.add_argument("-d", "--domain", default=DEFAULT_DOMAIN, help="Target domain for testing")
-    parser.add_argument("-c", "--code_dir", default=DEFAULT_CODE_DIRECTORY, help="Directory of the project code for analysis")
-    args = parser.parse_args()
-
-    domain = args.domain
-    code_directory = args.code_dir
+    domain = DEFAULT_DOMAIN
+    code_directory = DEFAULT_CODE_DIRECTORY
 
     print("Starting Automated Bug Bounty Testing with Enhanced Tools...\n")
     general_logger.info("Bug Bounty Testing Started.")
@@ -137,6 +144,15 @@ def main():
         print(f"Automated Test Results:\n{test_results}")
         general_logger.info(f"Automated Test Results:\n{test_results}")
 
+        # Сохраняем уязвимости и ответы от ChatGPT
+        vulnerabilities_and_responses = []
+        for vuln in vulnerabilities.splitlines():
+            response = ask_chatgpt(f"Какие шаги нужно предпринять для устранения уязвимости: {vuln}")
+            vulnerabilities_and_responses.append((vuln, response))
+
+        save_to_file([vuln for vuln, _ in vulnerabilities_and_responses],
+                     [response for _, response in vulnerabilities_and_responses])
+
         print("\nTesting complete. Ensure compliance with Doppler's Bug Bounty rules.")
         general_logger.info("Bug Bounty Testing Completed Successfully.")
 
@@ -145,6 +161,7 @@ def main():
         logging.error(error_message)
         general_logger.error(error_message)
         print(error_message)
+
 
 if __name__ == "__main__":
     main()
