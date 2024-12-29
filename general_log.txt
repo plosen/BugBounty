@@ -1,0 +1,4 @@
+2024-12-29 18:29:01,970 - INFO - Bug Bounty Testing Started.
+2024-12-29 18:29:01,970 - INFO - Enumerating subdomains for doppler.com.
+2024-12-29 19:17:17,639 - INFO - Bug Bounty Testing Started.
+2024-12-29 19:17:17,639 - INFO - Enumerating subdomains for doppler.com.

@@ -1,0 +1,1 @@
+2024-12-29 18:22:44,726 - ERROR - OpenAI API key not found in environment variables.
