@@ -28,6 +28,7 @@ general_handler = logging.FileHandler('general_log.txt')
 general_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
 general_logger.addHandler(general_handler)
 
+
 def perform_task_with_progress(task_name, task_function, *args, **kwargs):
     """
     Общая функция для выполнения задач с таймером и индикатором.
@@ -47,13 +48,14 @@ def perform_task_with_progress(task_name, task_function, *args, **kwargs):
 
         print(f"\n{task_name} завершено.")
         general_logger.info(f"{task_name} завершено. Результаты: {result}")
-        
+
         return result
 
     except Exception as e:
         print(f"❌ Ошибка при выполнении задачи {task_name}: {str(e)}")
         general_logger.error(f"Ошибка при выполнении задачи {task_name}: {str(e)}")
         return None
+
 
 def enumerate_domains_with_progress(domain):
     """
@@ -75,7 +77,7 @@ def enumerate_domains_with_progress(domain):
 
         print("\nПоддомены успешно найдены.")
         general_logger.info(f"Поддомены успешно найдены для {domain}: {subdomains}")
-        
+
         return subdomains
 
     except Exception as e:
@@ -83,11 +85,13 @@ def enumerate_domains_with_progress(domain):
         general_logger.error(f"Ошибка при поиске поддоменов для {domain}: {str(e)}")
         return []
 
+
 def main():
     # Парсинг аргументов командной строки
     parser = argparse.ArgumentParser(description="Automated Bug Bounty Testing Tool")
     parser.add_argument("-d", "--domain", default=DEFAULT_DOMAIN, help="Target domain for testing")
-    parser.add_argument("-c", "--code_dir", default=DEFAULT_CODE_DIRECTORY, help="Directory of the project code for analysis")
+    parser.add_argument("-c", "--code_dir", default=DEFAULT_CODE_DIRECTORY,
+                        help="Directory of the project code for analysis")
     args = parser.parse_args()
 
     domain = args.domain
@@ -167,6 +171,7 @@ def main():
         logging.error(error_message)
         general_logger.error(error_message)
         print(error_message)
+
 
 if __name__ == "__main__":
     main()
